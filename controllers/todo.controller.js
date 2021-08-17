@@ -1,48 +1,43 @@
-const todos = [
-    {
-      id: "1",
-      title: "Learn Express"
-    },
-    {
-      id: "2",
-      title: "Learn JavaScript"
-    },
-    {
-      id: "3",
-      title: "Learn Web Dev"
-    }
-];
+const Todo = require('../models/Todo.model');
 
-exports.getTodos = ((req, res) => {
+exports.getTodos = (async (req, res) => {
+    const todos = await Todo.find()
+
     res.status(200).send({
         todos
     });
 })
 
-exports.saveTodo = ((req, res) => {
-    const todo = req.body.todo;
-
-    todos.push(todo);
-    res.status(201).send({});
+exports.getTodoById = (async (req, res) => {
+  const id = req.params.id;
+  const todo = await Todo.findById(id);
+  res.status(200).send({suceess: true, data: todo});
 })
 
-exports.updateTodo = ((req, res) => {
-    const id = req.params.id; // id = 3
-    const todoTitle = req.body.title;
-  
-    // 1. identify the index of that todo
-    const updatedTodo = todos.find((todo) => todo.id === id)
 
-    const index = todos.indexOf(updatedTodo);
+exports.saveTodo = (async (req, res) => {
+    const todo = req.body.todo;
 
-    // 2. delete that todo
-    todos.splice(index, 1);
+    // Save the todo in database
+    const result = await Todo.create(todo)
 
-    // 3. push the new tod
-    todos.push({
-        id: id,
-        title: todoTitle
+    res.status(201).send({success: true, data: result});
+})
+
+exports.updateTodo = (async (req, res) => {
+    const id = req.params.id;
+    const updatedTodo = req.body.todo;
+
+    const todo = await Todo.findByIdAndUpdate(id, updatedTodo, {new: true});
+
+    res.status(200).send({
+      success: true,
+      data: todo
     })
-  
-    res.status(201).send({todos});
+})
+
+exports.deleteTodo = (async (req, res) => {
+  const id = req.params.id;
+  await Todo.findByIdAndDelete(id);
+  res.status(204).send({})
 })

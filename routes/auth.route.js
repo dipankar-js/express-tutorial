@@ -1,7 +1,8 @@
 const express = require('express');
 const { check } = require('express-validator');
 
-const {signupUser, loginUser} = require('../controllers/auth.controller');
+const {signupUser, loginUser, getUsers, listAdmins} = require('../controllers/auth.controller');
+const {validateUser, isAdmin} = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -17,6 +18,10 @@ router.post('/login',
     check('email').isEmail().withMessage('Please provide a valid email address'),
     loginUser
 );
+
+router.get('/users', validateUser, getUsers);
+
+router.get('/admin', validateUser, isAdmin, listAdmins);
 
 // Private Routes
 // '/users' , only loggedIn users can access all the users
